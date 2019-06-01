@@ -56,3 +56,17 @@ fn test_parse_tt() {
         }
     ), "1. struct, 2. User, 3. { name : String , age : i32 , }");
 }
+
+macro_rules! repeat {
+    ( $($e: expr),* ) => { &[ $( $e ),* ] };
+    ( $($e: expr);* ) => { repeat!( $( $e ),* ) };
+}
+
+#[test]
+fn test_repeat() {
+    let v: &[i32] = repeat!(10, 20, 30);
+    assert_eq!(format!("{:?}", v), "[10, 20, 30]");
+
+    let v: &[i32] = repeat!(100; 200; 300);
+    assert_eq!(format!("{:?}", v), "[100, 200, 300]");
+}
