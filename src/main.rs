@@ -129,3 +129,26 @@ fn test_complex_repeat() {
     };
     assert_eq!(format!("{:?}", v), "[91, 175, 300, 370]");
 }
+
+macro_rules! match_exprs {
+    ($($exprs:expr),*) => {
+        ( $($exprs),* )
+    };
+
+    ($($exprs:expr),* $(,)*) => {
+        match_exprs!( $($exprs),* )
+    };
+}
+
+#[test]
+fn test_match_exprs() {
+    let t = match_exprs!( 1, "hello", true );
+    assert_eq!(format!("{:?}", t), r#"(1, "hello", true)"#);
+
+    let t = match_exprs! {
+        true,
+        false,
+    };
+    assert_eq!(format!("{:?}", t), r#"(true, false)"#);
+}
+
