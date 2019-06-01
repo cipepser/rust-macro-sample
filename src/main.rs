@@ -70,3 +70,62 @@ fn test_repeat() {
     let v: &[i32] = repeat!(100; 200; 300);
     assert_eq!(format!("{:?}", v), "[100, 200, 300]");
 }
+
+macro_rules! complex_repeat {
+    (
+        $(
+            $x: expr => [
+                $( $y: expr ),*
+            ]
+        )*
+    ) => {
+        &[
+            $(
+                $( $x + $y ),*
+            ),*
+        ]
+    };
+
+    (
+        $(
+            $x: expr;
+            $( -> $y: expr )*
+            $( => $z: expr )*
+        )*
+    ) => {
+        &[
+            $(
+                $x
+                $( - $z )*
+                $( + $y )*
+            ),*
+        ]
+    };
+}
+
+#[test]
+fn test_complex_repeat() {
+    let v: &[i32] = complex_repeat! {
+        100 => [1, 2, 3]
+        200 => [4, 5, 6]
+    };
+    assert_eq!(format!("{:?}", v), "[101, 102, 103, 204, 205, 206]");
+
+    let v: &[i32] = complex_repeat! {
+      100;
+      -> 1
+      => 10
+
+      200;
+      -> 2
+      -> 3
+      => 10
+      => 20
+
+      300;
+
+      400;
+      => 30
+    };
+    assert_eq!(format!("{:?}", v), "[91, 175, 300, 370]");
+}
