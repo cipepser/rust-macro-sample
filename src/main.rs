@@ -36,3 +36,23 @@ fn test_define_fn() {
     define_fn!(hello, String, "hello".to_string());
     assert_eq!(hello(), "hello");
 }
+
+macro_rules! parse_tt {
+    ($t1: tt) => { format!("1. {}", stringify!($t1)) };
+    ($t1: tt $t2: tt) => { format!("1. {}, 2. {}", stringify!($t1), stringify!($t2)) };
+    ($t1: tt $t2: tt $t3: tt) => { format!("1. {}, 2. {}, 3. {}", stringify!($t1), stringify!($t2), stringify!($t3)) };
+}
+
+#[test]
+fn test_parse_tt() {
+    assert_eq!(parse_tt!(100), "1. 100");
+    assert_eq!(parse_tt!(aaa bbb), "1. aaa, 2. bbb");
+    assert_eq!(parse_tt!(true + false), "1. true, 2. +, 3. false");
+    assert_eq!(parse_tt!([1, 2, 3]), "1. [ 1 , 2 , 3 ]");
+    assert_eq!(parse_tt!(
+        struct User {
+            name: String,
+            age: i32,
+        }
+    ), "1. struct, 2. User, 3. { name : String , age : i32 , }");
+}
