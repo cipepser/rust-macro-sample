@@ -152,3 +152,25 @@ fn test_match_exprs() {
     assert_eq!(format!("{:?}", t), r#"(true, false)"#);
 }
 
+macro_rules! replace_expr {
+    ($_t:tt $sub:expr) => {$sub};
+}
+
+macro_rules! tuple_default {
+    ($name:ident, $($tup_tys:ty),*) => {
+        let $name: ( $( $tup_tys ),* ) = (
+            $(
+                replace_expr!(
+                    ($tup_tys)
+                    Default::default()
+                )
+            ),*
+        );
+    };
+}
+
+#[test]
+fn test_tuple_default() {
+    tuple_default!(t, i32, String, bool);
+    assert_eq!(format!("{:?}", t), r#"(0, "", false)"#);
+}
