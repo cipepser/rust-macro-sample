@@ -174,3 +174,32 @@ fn test_tuple_default() {
     tuple_default!(t, i32, String, bool);
     assert_eq!(format!("{:?}", t), r#"(0, "", false)"#);
 }
+
+macro_rules! sum_tt {
+    ( $t: tt $( $u: tt )+ ) => {
+        sum_tt!($t) $( + sum_tt! ( $u ) )*
+    };
+
+    ( ( $( $t: tt)+ ) ) => {
+        sum_tt!( $( $t )* )
+    };
+
+    ( [ $( $t: tt)+ ] ) => {
+        sum_tt!( $( $t )* )
+    };
+
+    ( { $( $t: tt)+ } ) => {
+        sum_tt!( $( $t )* )
+    };
+
+    ( $t: tt ) => { stringify!($t).parse::<i32>().unwrap_or_default() };
+
+}
+
+#[test]
+fn test_sum_tt() {
+    assert_eq!(sum_tt!( 1 2 3 ), 6);
+    assert_eq!(sum_tt!( 4 (5 6) ), 15);
+    assert_eq!(sum_tt!( [7] 8 {9} (10 11) ), 45);
+    assert_eq!(sum_tt!( 1 true 2 foo bar 3 + pi ), 6);
+}
